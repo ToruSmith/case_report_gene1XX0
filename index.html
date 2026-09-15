@@ -164,7 +164,19 @@ a{color:var(--teal-deep);}
 }
 .tab-btn.active{ background: var(--navy); color:#fff; }
 .tab-btn.active .tab-num{ background:rgba(255,255,255,0.18); color:#fff; }
-@media (max-width:640px){ .tab-btn{ padding:10px 13px; font-size:13.5px; } }
+.tab-btn .lbl-short{ display:none; }
+@media (max-width:640px){
+  .tabbar{ overflow-x:visible; }
+  .tab-btn{
+    flex:1 1 0; min-width:0; justify-content:center; padding:9px 6px; font-size:12.5px; gap:5px;
+  }
+  .tab-btn .tab-num{ width:17px; height:17px; font-size:10px; flex:none; }
+  .tab-btn .lbl-full{ display:none; }
+  .tab-btn .lbl-short{ display:inline; }
+}
+@media (max-width:360px){
+  .tab-btn{ font-size:11px; padding:8px 3px; gap:3px; }
+}
 
 .tab-panel{ display:none; padding-top:22px; }
 .tab-panel.active{ display:block; }
@@ -374,9 +386,9 @@ footer.app-footer .foot-brand{ font-weight:700; color:var(--ink); }
 
   <div class="tabbar-wrap">
     <div class="tabbar" role="tablist">
-      <button class="tab-btn active" data-tab="overview" type="button"><span class="tab-num">1</span>一區扣分總覽與分析</button>
-      <button class="tab-btn" data-tab="ranking" type="button"><span class="tab-num">2</span>成績與總排名</button>
-      <button class="tab-btn" data-tab="cases" type="button"><span class="tab-num">3</span>缺失案件明細</button>
+      <button class="tab-btn active" data-tab="overview" type="button"><span class="tab-num">1</span><span class="tab-label"><span class="lbl-full">一區扣分總覽與分析</span><span class="lbl-short">總覽分析</span></span></button>
+      <button class="tab-btn" data-tab="ranking" type="button"><span class="tab-num">2</span><span class="tab-label"><span class="lbl-full">成績與總排名</span><span class="lbl-short">成績排名</span></span></button>
+      <button class="tab-btn" data-tab="cases" type="button"><span class="tab-num">3</span><span class="tab-label"><span class="lbl-full">缺失案件明細</span><span class="lbl-short">缺失明細</span></span></button>
     </div>
   </div>
 
