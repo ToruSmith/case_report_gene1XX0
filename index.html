@@ -1,0 +1,1487 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>一區客服業務績效簡報</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;600;700;900&family=Noto+Sans+TC:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+<script src="./xlsx.full.min.js"></script>
+<script src="./chart.umd.js"></script>
+<style>
+:root{
+  --navy:#0A2A3A;
+  --navy-2:#0F3A4E;
+  --teal:#0E7C8A;
+  --teal-deep:#0A5F6B;
+  --teal-tint:#E7F3F3;
+  --paper:#F3F7F7;
+  --card:#FFFFFF;
+  --line:#DAE5E6;
+  --ink:#17282D;
+  --ink-soft:#5A6E73;
+  --amber:#E8A317;
+  --amber-tint:#FDF1D6;
+  --coral:#BD463C;
+  --coral-tint:#FBEAE8;
+  --gold:#B7902E;
+  --ripple: rgba(14,124,138,0.10);
+  --radius: 10px;
+  --shadow: 0 1px 2px rgba(10,42,58,0.06), 0 6px 20px rgba(10,42,58,0.06);
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  font-family:'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+  background:
+    radial-gradient(1100px 420px at 12% -8%, var(--ripple), transparent 60%),
+    radial-gradient(900px 380px at 100% 0%, rgba(201,129,42,0.06), transparent 55%),
+    var(--paper);
+  color:var(--ink);
+  min-height:100vh;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,h4{font-family:'Noto Serif TC','Noto Sans TC',serif; font-weight:700; margin:0;}
+::selection{ background: var(--teal-tint); color: var(--teal-deep); }
+button{font-family:inherit;}
+a{color:var(--teal-deep);}
+
+/* ---------- Top identity bar ---------- */
+.topbar{
+  background: linear-gradient(120deg, var(--navy) 0%, var(--navy-2) 62%, var(--teal-deep) 130%);
+  color:#fff;
+  padding: 18px 22px;
+  position:relative;
+  overflow:hidden;
+}
+.topbar::after{
+  content:"";
+  position:absolute; right:-60px; top:-90px; width:280px; height:280px;
+  border-radius:50%;
+  border: 40px solid rgba(255,255,255,0.05);
+}
+.topbar::before{
+  content:"";
+  position:absolute; right:80px; bottom:-120px; width:220px; height:220px;
+  border-radius:50%;
+  border: 26px solid rgba(255,255,255,0.045);
+}
+.topbar-inner{
+  max-width:1240px; margin:0 auto;
+  display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap;
+  position:relative; z-index:1;
+}
+.brand{ display:flex; align-items:center; gap:14px; }
+.brand-mark{
+  width:46px; height:46px; border-radius:12px;
+  background: rgba(255,255,255,0.10);
+  border:1px solid rgba(255,255,255,0.22);
+  display:flex; align-items:center; justify-content:center;
+  flex:none;
+}
+.brand-mark svg{ width:26px; height:26px; }
+.brand-text .eyebrow{
+  font-size:12.5px; letter-spacing:.02em; color:rgba(255,255,255,0.72); font-weight:500;
+}
+.brand-text h1{ font-size:22px; color:#fff; line-height:1.25; }
+.brand-text h1 small{ display:block; font-family:'Noto Sans TC'; font-weight:500; font-size:13px; color:rgba(255,255,255,0.78); margin-top:2px; }
+
+.top-actions{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+.chip{
+  font-size:12.5px; font-weight:600; color:#fff;
+  background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.28);
+  padding:6px 12px; border-radius:999px; white-space:nowrap;
+}
+.btn{
+  appearance:none; border:1px solid transparent; cursor:pointer;
+  border-radius:8px; padding:9px 16px; font-size:14px; font-weight:600;
+  display:inline-flex; align-items:center; gap:7px; transition:transform .12s ease, background .15s ease, box-shadow .15s ease;
+}
+.btn:active{ transform: translateY(1px); }
+.btn-light{ background:rgba(255,255,255,0.14); color:#fff; border-color:rgba(255,255,255,0.32); }
+.btn-light:hover{ background:rgba(255,255,255,0.22); }
+.btn-solid{ background:var(--teal); color:#fff; }
+.btn-solid:hover{ background:var(--teal-deep); }
+.btn-ghost{ background:transparent; color:var(--teal-deep); border-color:var(--line); }
+.btn-ghost:hover{ background:var(--teal-tint); }
+.btn-sm{ padding:6px 12px; font-size:13px; }
+.btn[disabled]{ opacity:.5; cursor:not-allowed; }
+
+/* ---------- Upload screen ---------- */
+.upload-wrap{ max-width:920px; margin:0 auto; padding:56px 20px 80px; }
+.upload-hero{ text-align:center; margin-bottom:34px; }
+.upload-hero .kicker{ color:var(--teal-deep); font-weight:700; font-size:13.5px; letter-spacing:.02em; }
+.upload-hero h2{ font-size:30px; color:var(--navy); margin-top:8px; line-height:1.4; }
+.upload-hero p{ color:var(--ink-soft); font-size:15px; max-width:620px; margin:12px auto 0; line-height:1.8; }
+
+.dropzones{ display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+@media (max-width:760px){ .dropzones{ grid-template-columns:1fr; } }
+.dropzone{
+  background:var(--card); border:2px dashed var(--line); border-radius:14px;
+  padding:26px 20px; text-align:center; cursor:pointer; transition: border-color .15s ease, background .15s ease;
+  position:relative;
+}
+.dropzone:hover, .dropzone.drag{ border-color:var(--teal); background:var(--teal-tint); }
+.dropzone.filled{ border-style:solid; border-color:var(--teal); background:var(--teal-tint); }
+.dropzone .dz-icon{
+  width:44px; height:44px; margin:0 auto 12px; border-radius:10px;
+  background:var(--teal-tint); display:flex; align-items:center; justify-content:center;
+}
+.dropzone.filled .dz-icon{ background:#fff; }
+.dropzone .dz-icon svg{ width:22px; height:22px; color:var(--teal-deep); }
+.dropzone h3{ font-size:15.5px; color:var(--navy); margin-bottom:4px; }
+.dropzone p{ font-size:12.5px; color:var(--ink-soft); margin:0; line-height:1.6; }
+.dropzone .dz-filename{ font-size:12.5px; color:var(--teal-deep); font-weight:700; margin-top:8px; word-break:break-all; }
+.dropzone input[type=file]{ position:absolute; inset:0; opacity:0; cursor:pointer; }
+
+.upload-actions{ margin-top:26px; display:flex; justify-content:center; gap:12px; flex-wrap:wrap; }
+.upload-note{ margin-top:22px; font-size:12.5px; color:var(--ink-soft); text-align:center; line-height:1.9; }
+.upload-error{
+  margin-top:18px; background:var(--coral-tint); border:1px solid #EFC6C1; color:#8B2F27;
+  padding:12px 16px; border-radius:10px; font-size:13.5px; text-align:left; white-space:pre-line;
+}
+
+/* ---------- App shell ---------- */
+#app{ display:none; }
+.container{ max-width:1240px; margin:0 auto; padding:22px 20px 70px; }
+
+/* Tabs */
+.tabbar-wrap{ position:sticky; top:0; z-index:20; background:var(--paper); padding-top:14px; padding-bottom:2px; }
+.tabbar{
+  display:flex; gap:6px; background:var(--card); border:1px solid var(--line); border-radius:12px;
+  padding:5px; box-shadow:var(--shadow); overflow-x:auto; -webkit-overflow-scrolling:touch;
+}
+.tab-btn{
+  appearance:none; border:none; background:transparent; cursor:pointer;
+  padding:11px 18px; border-radius:8px; font-size:14.5px; font-weight:700; color:var(--ink-soft);
+  white-space:nowrap; flex:none; display:flex; align-items:center; gap:8px;
+  transition: background .15s ease, color .15s ease;
+}
+.tab-btn .tab-num{
+  width:20px; height:20px; border-radius:50%; background:var(--teal-tint); color:var(--teal-deep);
+  font-size:11.5px; display:flex; align-items:center; justify-content:center; font-weight:800;
+}
+.tab-btn.active{ background: var(--navy); color:#fff; }
+.tab-btn.active .tab-num{ background:rgba(255,255,255,0.18); color:#fff; }
+@media (max-width:640px){ .tab-btn{ padding:10px 13px; font-size:13.5px; } }
+
+.tab-panel{ display:none; padding-top:22px; }
+.tab-panel.active{ display:block; }
+
+/* Section headings */
+.section-head{ display:flex; align-items:baseline; justify-content:space-between; gap:12px; margin-bottom:14px; flex-wrap:wrap; }
+.section-head h2{ font-size:19px; color:var(--navy); }
+.section-head .section-sub{ font-size:12.5px; color:var(--ink-soft); }
+.block{ margin-bottom:30px; }
+
+/* KPI cards */
+.kpi-grid{ display:grid; grid-template-columns:repeat(6, 1fr); gap:12px; }
+@media (max-width:1080px){ .kpi-grid{ grid-template-columns:repeat(3,1fr); } }
+@media (max-width:620px){ .kpi-grid{ grid-template-columns:repeat(2,1fr); } }
+.kpi-card{
+  background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
+  padding:16px 16px 14px; box-shadow:var(--shadow); position:relative; overflow:hidden;
+}
+.kpi-card .kpi-bar{ position:absolute; left:0; top:0; bottom:0; width:4px; background:var(--teal); }
+.kpi-card.tone-amber .kpi-bar{ background:var(--amber); }
+.kpi-card.tone-coral .kpi-bar{ background:var(--coral); }
+.kpi-card.tone-navy .kpi-bar{ background:var(--navy); }
+.kpi-label{ font-size:12px; color:var(--ink-soft); font-weight:600; margin-bottom:8px; line-height:1.5; }
+.kpi-value{ font-family:'Noto Serif TC'; font-size:30px; font-weight:800; color:var(--navy); line-height:1; }
+.kpi-value .unit{ font-size:13px; color:var(--ink-soft); font-weight:600; margin-left:4px; }
+.kpi-foot{ font-size:11.5px; color:var(--ink-soft); margin-top:8px; }
+
+.presenting .kpi-value{ font-size:38px; }
+.presenting .kpi-label{ font-size:13.5px; }
+.presenting .section-head h2{ font-size:23px; }
+.presenting .card-title{ font-size:16.5px; }
+
+/* Cards / chart containers */
+.grid-2{ display:grid; grid-template-columns:1.2fr 1fr; gap:16px; }
+@media (max-width:900px){ .grid-2{ grid-template-columns:1fr; } }
+.grid-3{ display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+@media (max-width:900px){ .grid-3{ grid-template-columns:1fr; } }
+.card{
+  background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
+  padding:18px 18px 14px; box-shadow:var(--shadow);
+}
+.card-title{ font-size:14.5px; font-weight:700; color:var(--navy); margin-bottom:2px; }
+.card-sub{ font-size:12px; color:var(--ink-soft); margin-bottom:12px; }
+.chart-box{ position:relative; height:280px; }
+.chart-box.tall{ height:360px; }
+.chart-box.short{ height:220px; }
+
+/* Station table */
+.table-wrap{ overflow-x:auto; border:1px solid var(--line); border-radius:var(--radius); background:var(--card); }
+table{ width:100%; border-collapse:collapse; font-size:13.5px; min-width:640px; }
+thead th{
+  text-align:left; background:var(--teal-tint); color:var(--teal-deep); font-weight:700;
+  padding:10px 12px; border-bottom:1px solid var(--line); white-space:nowrap; position:sticky; top:0;
+}
+tbody td{ padding:9px 12px; border-bottom:1px solid var(--line); color:var(--ink); vertical-align:top; }
+tbody tr:last-child td{ border-bottom:none; }
+tbody tr:hover{ background:var(--paper); }
+tbody tr.row-total td{ background:var(--navy); color:#fff; font-weight:700; }
+tbody tr.row-hq td{ background:var(--amber-tint); font-weight:600; }
+td.num, th.num{ text-align:right; font-variant-numeric:tabular-nums; }
+.badge{ display:inline-block; padding:2px 9px; border-radius:999px; font-size:11.5px; font-weight:700; }
+.badge-teal{ background:var(--teal-tint); color:var(--teal-deep); }
+.badge-coral{ background:var(--coral-tint); color:#8B2F27; }
+.badge-amber{ background:var(--amber-tint); color:#8A5A16; }
+.badge-gray{ background:#EEF2F2; color:var(--ink-soft); }
+.rank-pill{
+  display:inline-flex; align-items:center; justify-content:center; min-width:26px; height:26px; padding:0 8px;
+  border-radius:8px; font-weight:800; font-size:13px; background:#EEF2F2; color:var(--ink-soft);
+}
+.rank-pill.gold{ background:#F7EBC9; color:#8A6A10; }
+.rank-pill.self{ background:var(--navy); color:#fff; }
+
+/* 各月得分與排名 table */
+.score-rank-table{ min-width:920px; font-size:12.5px; }
+.score-rank-table thead th{ text-align:center; }
+.score-rank-table thead th.sub{ background:var(--paper); color:var(--ink-soft); font-weight:600; font-size:11px; padding:6px 10px; }
+.score-rank-table td.rowlabel, .score-rank-table th.rowlabel{ text-align:left; position:sticky; left:0; background:var(--card); z-index:1; white-space:nowrap; }
+.score-rank-table td.rank-good{ background:#E2F0DE; color:#2E6B34; font-weight:700; }
+.score-rank-table td.rank-bad{ background:var(--coral-tint); color:#8B2F27; font-weight:700; }
+
+.own-row td{ background: var(--teal-tint) !important; font-weight:700; }
+/* 各月得分與排名 table：一區列改用深底＋金色左框，避免被表內淡綠/淡紅排名色蓋過 */
+.score-rank-table tbody tr.own-row td{ border-top:2px solid var(--navy); border-bottom:2px solid var(--navy); background:transparent !important; }
+.score-rank-table tbody tr.own-row td.rowlabel{ background:var(--navy) !important; color:#fff; font-weight:800; border-left:4px solid var(--gold); }
+.score-rank-table tbody tr.own-row td.rowlabel .badge-teal{ background:rgba(255,255,255,0.85); color:var(--navy); }
+.score-rank-table tbody tr.own-row td.rank-good{ background:#E2F0DE !important; }
+.score-rank-table tbody tr.own-row td.rank-bad{ background:var(--coral-tint) !important; }
+
+/* Filters bar (case explorer) */
+.filters{
+  display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:14px;
+  background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:12px 14px; box-shadow:var(--shadow);
+}
+.filters input[type=text], .filters select{
+  font-family:inherit; font-size:13.5px; padding:8px 11px; border-radius:8px; border:1px solid var(--line);
+  background:#fff; color:var(--ink);
+}
+.filters input[type=text]{ flex:1 1 220px; min-width:180px; }
+.filters .filter-count{ font-size:12.5px; color:var(--ink-soft); margin-left:auto; white-space:nowrap; }
+
+.case-list{ display:flex; flex-direction:column; gap:10px; }
+.case-item{
+  background:var(--card); border:1px solid var(--line); border-left:4px solid var(--teal);
+  border-radius:10px; padding:13px 15px; cursor:pointer; box-shadow:var(--shadow);
+}
+.case-item.type-duplicate{ border-left-color:var(--coral); }
+.case-item.type-overdue{ border-left-color:var(--amber); }
+.case-item.type-dissatisfied{ border-left-color:var(--teal); }
+.case-item .case-top{ display:flex; justify-content:space-between; gap:10px; align-items:flex-start; flex-wrap:wrap; }
+.case-item .case-meta{ font-size:12px; color:var(--ink-soft); display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-top:4px;}
+.station-badge{ display:inline-block; padding:2px 9px; border-radius:999px; font-size:11.5px; font-weight:700; }
+.case-item .case-desc{ font-size:13.5px; color:var(--ink); margin-top:9px; line-height:1.7; }
+.case-item .case-detail{ display:none; margin-top:10px; padding-top:10px; border-top:1px dashed var(--line); font-size:13px; color:var(--ink-soft); line-height:1.85; }
+.case-item.open .case-detail{ display:block; }
+.case-item .case-info{ margin-top:9px; padding:9px 11px; background:var(--paper); border-radius:8px; font-size:12.5px; line-height:1.7; }
+.case-item .case-info-row{ display:flex; gap:8px; }
+.case-item .case-info-row + .case-info-row{ margin-top:3px; }
+.case-item .case-info-label{ flex:none; width:118px; color:var(--teal-deep); font-weight:700; }
+.case-item .case-info-value{ color:var(--ink); }
+.case-item .case-info-value-flag{ color:#8B2F27; font-weight:700; }
+.case-item .case-id{ font-weight:700; color:var(--navy); font-size:13.5px; }
+.month-figure{ font-weight:800; color:var(--gold); }
+.clamp2{ display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+.case-item.open .clamp2{ -webkit-line-clamp:unset; }
+.empty-note{
+  text-align:center; padding:38px 20px; color:var(--ink-soft); background:var(--card);
+  border:1px dashed var(--line); border-radius:var(--radius); font-size:14px;
+}
+
+.note-banner{
+  display:flex; gap:10px; align-items:flex-start; background:var(--teal-tint); border:1px solid #CDE7E8;
+  color:var(--teal-deep); padding:12px 15px; border-radius:10px; font-size:13px; line-height:1.7; margin-bottom:16px;
+}
+.note-banner.warn{ background:var(--amber-tint); border-color:#F0DBB2; color:#8A5A16; }
+.note-banner svg{ flex:none; width:18px; height:18px; margin-top:1px; }
+
+.legend-swatch{ display:inline-block; width:10px; height:10px; border-radius:3px; margin-right:6px; vertical-align:middle; }
+
+footer.app-footer{ text-align:center; padding:26px 20px 44px; color:var(--ink-soft); font-size:12px; }
+footer.app-footer .foot-brand{ font-weight:700; color:var(--ink); }
+
+@media print{
+  .topbar, .tabbar-wrap, .filters, .upload-wrap{ display:none !important; }
+  .tab-panel{ display:block !important; }
+}
+</style>
+</head>
+<body>
+
+<!-- ===================== TOP BAR ===================== -->
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">
+      <div class="brand-mark">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C12 2 5 10.5 5 15a7 7 0 0 0 14 0C19 10.5 12 2 12 2Z" stroke="white" stroke-width="1.6" stroke-linejoin="round"/><path d="M8.5 15.2a3.5 3.5 0 0 0 3.5 3.4" stroke="white" stroke-width="1.6" stroke-linecap="round"/></svg>
+      </div>
+      <div class="brand-text">
+        <div class="eyebrow">客服服務業務績效稽核</div>
+        <h1>一區客服績效簡報<small id="monthLabelText">尚未匯入資料</small></h1>
+      </div>
+    </div>
+    <div class="top-actions" id="topActions" style="display:none;">
+      <span class="chip" id="updatedChip">—</span>
+      <button class="btn btn-light btn-sm" id="btnPresent" type="button">簡報模式</button>
+      <button class="btn btn-light btn-sm" id="btnExport" type="button">匯出獨立報告</button>
+      <button class="btn btn-light btn-sm" id="btnReupload" type="button">重新匯入</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== UPLOAD SCREEN ===================== -->
+<div id="uploadScreen" class="upload-wrap">
+  <div class="upload-hero">
+    <div class="kicker">月度資料匯入</div>
+    <h2>匯入兩份報表，自動生成一區績效簡報</h2>
+    <p>請分別匯入當月的「客戶服務業務績效(查核)統計表」與「排名試算表」，系統將在瀏覽器端直接解析並生成互動報告，資料不會上傳至任何伺服器。</p>
+  </div>
+
+  <div class="dropzones">
+    <label class="dropzone" id="dz1" for="file1">
+      <div class="dz-icon"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 4h10l6 6v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M14 4v6h6" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg></div>
+      <h3>客戶服務業務績效(查核)統計表</h3>
+      <p>.xls／.xlsx　—　含當月頁簽、重複案件、逾期案件、不滿意案件</p>
+      <div class="dz-filename" id="dz1name"></div>
+      <input type="file" id="file1" accept=".xls,.xlsx">
+    </label>
+    <label class="dropzone" id="dz2" for="file2">
+      <div class="dz-icon"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 4h10l6 6v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M14 4v6h6" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg></div>
+      <h3>排名試算表</h3>
+      <p>.xlsx　—　含顧客滿意度、排名試算、排名對比、各月份缺失表</p>
+      <div class="dz-filename" id="dz2name"></div>
+      <input type="file" id="file2" accept=".xls,.xlsx">
+    </label>
+  </div>
+
+  <div class="upload-actions">
+    <button class="btn btn-solid" id="btnGenerate" type="button" disabled>產生互動報告</button>
+    <button class="btn btn-ghost" id="btnLoadSample" type="button" style="display:none;">載入示範資料</button>
+  </div>
+  <div id="uploadError" class="upload-error" style="display:none;"></div>
+  <div class="upload-note">兩份檔案的頁簽名稱與欄位格式須與固定範本一致；月份會依檔案內容自動偵測。<br>本工具純前端運作，關閉分頁即清除資料，適合部署於 GitHub Pages 重複使用。</div>
+</div>
+
+<!-- ===================== APP ===================== -->
+<div id="app">
+<div class="container">
+
+  <div class="tabbar-wrap">
+    <div class="tabbar" role="tablist">
+      <button class="tab-btn active" data-tab="overview" type="button"><span class="tab-num">1</span>一區扣分總覽與分析</button>
+      <button class="tab-btn" data-tab="ranking" type="button"><span class="tab-num">2</span>成績與總排名</button>
+      <button class="tab-btn" data-tab="cases" type="button"><span class="tab-num">3</span>缺失案件明細</button>
+    </div>
+  </div>
+
+  <!-- TAB 1: OVERVIEW -->
+  <div class="tab-panel active" id="panel-overview"></div>
+
+  <!-- TAB 2: RANKING -->
+  <div class="tab-panel" id="panel-ranking"></div>
+
+  <!-- TAB 3: CASES -->
+  <div class="tab-panel" id="panel-cases"></div>
+
+</div>
+<footer class="app-footer">
+  <span class="foot-brand">一區客服績效簡報工具</span>　資料來源：客戶服務業務績效(查核)統計表・排名試算表　｜　純前端解析，僅供內部簡報使用
+</footer>
+</div>
+
+<script id="snapshot-data" type="application/json"></script>
+<script>
+(function(){
+"use strict";
+
+/* =========================================================================
+   0. CONSTANTS & UTILITIES
+   ========================================================================= */
+var CN_NUM = {'一':1,'二':2,'三':3,'四':4,'五':5,'六':6,'七':7,'八':8,'九':9,'十':10,'十一':11,'十二':12};
+var CANONICAL_LABELS = ['1區','2區','3區','4區','5區','6區','7區','8區','9區','10區','11區','12區','屏東區'];
+var OUR_REGION_IDX = 1;
+var MONTH_COLS = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+
+function normalizeRegion(label){
+  if (label === undefined || label === null) return null;
+  var s = String(label).trim();
+  if (!s) return null;
+  if (s.indexOf('屏東') !== -1) return 13;
+  var m = s.match(/^(\d+)\s*區/);
+  if (m) return parseInt(m[1], 10);
+  m = s.match(/^([一二三四五六七八九十]+)區$/);
+  if (m && CN_NUM[m[1]] != null) return CN_NUM[m[1]];
+  return null;
+}
+
+function num(v){ var n = (v===null||v===undefined||v==='') ? 0 : Number(v); return isNaN(n) ? 0 : n; }
+function fmtInt(v){ return num(v).toLocaleString('zh-Hant-TW'); }
+function fmtPct(v){
+  if (v===null||v===undefined||v==='') return '0.00%';
+  var n = Number(v);
+  if (isNaN(n)) return String(v);
+  return (n*100).toFixed(2) + '%';
+}
+function esc(s){
+  return String(s===undefined||s===null?'':s).replace(/[&<>"']/g, function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+  });
+}
+function pad2(n){ return String(n).padStart(2,'0'); }
+
+function excelSerialToDate(serial){
+  var utcDays = Math.floor(serial - 25569);
+  var utcValue = utcDays * 86400;
+  var dateInfo = new Date(utcValue * 1000);
+  var fractionalDay = serial - Math.floor(serial) + 0.0000001;
+  var totalSeconds = Math.floor(86400 * fractionalDay);
+  var seconds = totalSeconds % 60;
+  totalSeconds -= seconds;
+  var hours = Math.floor(totalSeconds / 3600);
+  var minutes = Math.floor(totalSeconds / 60) % 60;
+  return new Date(Date.UTC(dateInfo.getUTCFullYear(), dateInfo.getUTCMonth(), dateInfo.getUTCDate(), hours, minutes, seconds));
+}
+function formatDateTime(v){
+  if (v === null || v === undefined || v === '') return '';
+  var d = null;
+  if (typeof v === 'number') {
+    d = excelSerialToDate(v);
+  } else if (v instanceof Date) {
+    d = v;
+  } else {
+    var s = String(v).trim().replace(/\./g, '/').replace(/-/g, '/');
+    var m = s.match(/(\d{4})\/(\d{1,2})\/(\d{1,2})(?:[ T](\d{1,2}):(\d{2}))?/);
+    if (m) {
+      d = new Date(Date.UTC(+m[1], +m[2]-1, +m[3], m[4]?+m[4]:0, m[5]?+m[5]:0));
+    } else {
+      return s;
+    }
+  }
+  if (!d || isNaN(d.getTime())) return String(v).trim();
+  return d.getUTCFullYear() + '/' + pad2(d.getUTCMonth()+1) + '/' + pad2(d.getUTCDate()) + ' ' + pad2(d.getUTCHours()) + ':' + pad2(d.getUTCMinutes());
+}
+function monthFromFormatted(fmt){
+  var m = fmt && fmt.match(/^\d{4}\/(\d{2})\//);
+  return m ? (parseInt(m[1],10) + '月') : '';
+}
+function aoa(ws){
+  return XLSX.utils.sheet_to_json(ws, {header:1, raw:true, defval:null});
+}
+
+/* =========================================================================
+   1. PARSERS
+   ========================================================================= */
+function parsePerfWorkbook(wb){
+  var result = { monthLabel:null, sourceSheet:null, stations:[], totals:null, division:null,
+    duplicateCases:[], overdueCases:[], dissatisfied:{hasCases:false, note:'', rows:[]} };
+
+  var monthlySheetName = wb.SheetNames.find(function(n){ return /^\d{4,6}$/.test(n.trim()); });
+  result.sourceSheet = monthlySheetName || null;
+
+  var cols = ['name','backTotal','attitudeCum','attitudeMonth','overdueCum','overdueMonth','dupCum','dupMonth','phoneCum','phoneMonth','deductCum','deductMonth','deductRatio','note'];
+  function rowToObj(r){
+    var o = {};
+    cols.forEach(function(c,i){ o[c] = (r && r[i] !== undefined) ? r[i] : null; });
+    o.computedDeduct = num(o.overdueCum)+num(o.dupCum)+num(o.phoneCum)+num(o.attitudeCum);
+    o.computedDeductMonth = num(o.overdueMonth)+num(o.dupMonth)+num(o.phoneMonth)+num(o.attitudeMonth);
+    // 原始表格「扣分件數佔全部案件之比例」欄位在來源檔案中通常是空白，改為自行計算：扣分推算(累計) / 後送總案件數(累計)
+    o.deductRatio = num(o.backTotal) > 0 ? (o.computedDeduct / num(o.backTotal)) : 0;
+    return o;
+  }
+
+  if (monthlySheetName) {
+    var rows = aoa(wb.Sheets[monthlySheetName]);
+    var title = (rows[0] && rows[0][0]) ? String(rows[0][0]) : '';
+    var m = title.match(/(\d+)年(\d+)月/);
+    if (m) result.monthLabel = m[1] + '年' + m[2] + '月';
+    else {
+      var mm = monthlySheetName.match(/^(\d{3})(\d{2})$/);
+      if (mm) result.monthLabel = mm[1] + '年' + mm[2] + '月';
+    }
+    var startIdx = -1;
+    for (var i=0;i<rows.length;i++){ if (rows[i] && String(rows[i][0]||'').trim() === '總計'){ startIdx = i; break; } }
+    if (startIdx >= 0) {
+      result.totals = rowToObj(rows[startIdx]);
+      for (var k = startIdx+1; k < rows.length; k++){
+        var r = rows[k];
+        var c0 = (r && r[0] != null) ? String(r[0]).trim() : '';
+        if (!c0 || c0.charAt(0) === '※' || c0.indexOf('請核章') !== -1) break;
+        var obj = rowToObj(r);
+        if (c0 === '區處') result.division = obj;
+        else result.stations.push(obj);
+      }
+    }
+  }
+
+  var dupSheetName = wb.SheetNames.find(function(n){ return n.indexOf('重複案件') !== -1; });
+  if (dupSheetName) {
+    var drows = aoa(wb.Sheets[dupSheetName]);
+    var hIdx = -1;
+    for (var di=0; di<drows.length; di++){ if (drows[di] && drows[di][0] === '序號'){ hIdx = di; break; } }
+    if (hIdx >= 0) {
+      for (var dj = hIdx+1; dj < drows.length; dj++){
+        var dr = drows[dj];
+        if (!dr || dr[1] === null || dr[1] === undefined) continue;
+        var rt = formatDateTime(dr[2]);
+        result.duplicateCases.push({
+          type:'duplicate', seq: dr[0], caseId: dr[1] != null ? String(dr[1]) : '',
+          reportTime: rt, month: monthFromFormatted(rt),
+          description: dr[3] || '', address: dr[4] || '', category: dr[5] || '',
+          prevCase: dr[6] || '', prevResult: dr[7] || '', appealResult: dr[8] || '',
+          station: dr[9] || '', deducted: (String(dr[10]||'').trim().toLowerCase() === 'v')
+        });
+      }
+    }
+  }
+
+  var odSheetName = wb.SheetNames.find(function(n){ return n.indexOf('逾期案件') !== -1; });
+  if (odSheetName) {
+    var orows = aoa(wb.Sheets[odSheetName]);
+    var ohIdx = -1;
+    for (var oi=0; oi<orows.length; oi++){ if (orows[oi] && orows[oi][0] === '受理編號'){ ohIdx = oi; break; } }
+    if (ohIdx >= 0) {
+      var lastMonth = '';
+      for (var oj = ohIdx+1; oj < orows.length; oj++){
+        var or_ = orows[oj];
+        if (!or_ || or_[0] === null || or_[0] === undefined) continue;
+        var monthCell = (or_[10] != null && String(or_[10]).trim() !== '') ? String(or_[10]).trim() : lastMonth;
+        lastMonth = monthCell;
+        var ort = formatDateTime(or_[1]);
+        result.overdueCases.push({
+          type:'overdue', caseId:String(or_[0]), reportTime: ort, month: monthCell || monthFromFormatted(ort),
+          serviceCategory: or_[2] || '', station: or_[3] || '', address: or_[4] || '',
+          description: or_[5] || '', processHours: or_[6], repairCaseId: or_[7] || '',
+          completionOverdue: or_[8] || '', appealResult: or_[9] || ''
+        });
+      }
+    }
+  }
+
+  var dsName = wb.SheetNames.find(function(n){ return n.indexOf('不滿意案件') !== -1; });
+  if (dsName) {
+    var srows = aoa(wb.Sheets[dsName]);
+    if (srows.length <= 1) {
+      result.dissatisfied.hasCases = false;
+      result.dissatisfied.note = (srows[0] && srows[0][0]) ? String(srows[0][0]) : '無資料';
+    } else {
+      var headers = srows[0].map(function(h){ return h==null?'':String(h); });
+      var any = false;
+      for (var si=1; si<srows.length; si++){
+        var sr = srows[si];
+        if (!sr || sr.every(function(v){ return v===null||v===''; })) continue;
+        any = true;
+        var sObj = {}; headers.forEach(function(h,idx){ sObj[h||('col'+idx)] = sr[idx]; });
+        result.dissatisfied.rows.push({
+          type:'dissatisfied', caseId: sObj['受理編號']||sObj['案件編號']||('D'+si),
+          reportTime: formatDateTime(sObj['申報時間']||sObj['通報時間']), month:'',
+          station: sObj['廠所']||'', description: sObj['處理情形']||sObj['問題描述(訴求)-參考']||JSON.stringify(sObj),
+          serviceCategory: sObj['服務類別']||sObj['案別']||'', address: sObj['地址']||'', appealResult:''
+        });
+      }
+      result.dissatisfied.hasCases = any;
+      if (!any) result.dissatisfied.note = '115年目前累計暫無『不滿意案件』';
+    }
+  }
+  return result;
+}
+
+function monthColsWithData(dataRows, headerRow){
+  var idxs = [];
+  headerRow.forEach(function(h,i){ if (MONTH_COLS.indexOf(h) !== -1) idxs.push(i); });
+  var active = [];
+  idxs.forEach(function(ci){
+    var hasData = dataRows.some(function(r){ return r && r[ci] !== null && r[ci] !== undefined && r[ci] !== ''; });
+    if (hasData) active.push(ci);
+  });
+  return active;
+}
+
+function parseRankWorkbook(wb){
+  var result = { satisfaction:[], trial:{months:[],byRegion:{}}, compare:{months:[],byRegion:{}},
+    deficiency:{overdue:{months:[],byRegion:{}}, duplicate:{months:[],byRegion:{}}, dissatisfied:{months:[],byRegion:{}}} };
+
+  var satName = wb.SheetNames.find(function(n){ return n.indexOf('顧客滿意度') !== -1; });
+  if (satName) {
+    var srows = aoa(wb.Sheets[satName]);
+    var hIdx = -1;
+    for (var i=0;i<srows.length;i++){ if (srows[i] && srows[i].indexOf('一、顧客滿意度調查') !== -1){ hIdx = i; break; } }
+    if (hIdx >= 0) {
+      for (var j=hIdx+1;j<srows.length;j++){
+        var r = srows[j]; var idx = normalizeRegion(r && r[0]);
+        if (!idx) continue;
+        result.satisfaction.push({ regionIdx:idx, region:CANONICAL_LABELS[idx-1], satisfactionScore:r[1], phoneScore:r[2], csScore:r[3], csRank:r[4], totalScore:r[5], totalRank:r[6] });
+      }
+    }
+  }
+
+  var trialName = wb.SheetNames.find(function(n){ return n.indexOf('排名試算') !== -1; });
+  if (trialName) {
+    var trows = aoa(wb.Sheets[trialName]);
+    var thIdx = -1;
+    for (var ti=0; ti<trows.length; ti++){ if (trows[ti] && trows[ti][0]==='區處' && trows[ti].indexOf('1月')!==-1){ thIdx = ti; break; } }
+    if (thIdx >= 0) {
+      var theader = trows[thIdx];
+      var totalCol = theader.indexOf('加總'); var rankCol = theader.indexOf('排名');
+      var tdata = [];
+      for (var tj=thIdx+1; tj<trows.length; tj++){
+        var tr = trows[tj]; var tidx = normalizeRegion(tr && tr[0]);
+        if (!tidx) { if (tr && tr[0]) break; else continue; }
+        tdata.push(tr);
+      }
+      var tActive = monthColsWithData(tdata, theader);
+      result.trial.months = tActive.map(function(ci){ return theader[ci]; });
+      tdata.forEach(function(tr){
+        var tidx = normalizeRegion(tr[0]);
+        result.trial.byRegion[tidx] = {
+          region: CANONICAL_LABELS[tidx-1],
+          scores: tActive.map(function(ci){ return tr[ci]; }),
+          total: totalCol>=0 ? tr[totalCol] : null,
+          rank: rankCol>=0 ? tr[rankCol] : null
+        };
+      });
+    }
+  }
+
+  var cmpName = wb.SheetNames.find(function(n){ return n.indexOf('排名對比') !== -1; });
+  if (cmpName) {
+    var crows = aoa(wb.Sheets[cmpName]);
+    var chIdx = -1;
+    for (var ci2=0; ci2<crows.length; ci2++){ if (crows[ci2] && crows[ci2][0]==='區處' && crows[ci2].indexOf('1月')!==-1){ chIdx = ci2; break; } }
+    if (chIdx >= 0) {
+      var cheader = crows[chIdx];
+      var cdata = [];
+      for (var cj=chIdx+1; cj<crows.length; cj++){
+        var cr = crows[cj]; var cidx = normalizeRegion(cr && cr[0]);
+        if (!cidx) { if (cr && cr[0]) break; else continue; }
+        cdata.push(cr);
+      }
+      var cActive = monthColsWithData(cdata, cheader);
+      result.compare.months = cActive.map(function(ci){ return cheader[ci]; });
+      cdata.forEach(function(cr){
+        var cidx = normalizeRegion(cr[0]);
+        result.compare.byRegion[cidx] = { region:CANONICAL_LABELS[cidx-1], ranks: cActive.map(function(ci){ return cr[ci]; }) };
+      });
+    }
+  }
+
+  var defName = wb.SheetNames.find(function(n){ return n.indexOf('各月份缺失表') !== -1; });
+  if (defName) {
+    var frows = aoa(wb.Sheets[defName]);
+    var sectionMap = { '逾期':'overdue', '重複案件':'duplicate', '不滿意案件':'dissatisfied' };
+    var fi = 0;
+    while (fi < frows.length) {
+      var fc0 = (frows[fi] && frows[fi][0]) ? String(frows[fi][0]).trim() : '';
+      if (sectionMap[fc0]) {
+        var key = sectionMap[fc0];
+        var fheader = frows[fi+1] || [];
+        var fdata = []; var fj = fi+2;
+        for (; fj<frows.length; fj++){
+          var fr = frows[fj]; var fidx = normalizeRegion(fr && fr[0]);
+          if (!fidx) break;
+          fdata.push(fr);
+        }
+        var fActive = monthColsWithData(fdata, fheader);
+        result.deficiency[key].months = fActive.map(function(ci){ return fheader[ci]; });
+        var totalColIdx = fheader.indexOf('總計');
+        fdata.forEach(function(fr){
+          var fidx = normalizeRegion(fr[0]);
+          result.deficiency[key].byRegion[fidx] = {
+            region: CANONICAL_LABELS[fidx-1],
+            monthly: fActive.map(function(ci){ return num(fr[ci]); }),
+            total: totalColIdx>=0 ? num(fr[totalColIdx]) : null
+          };
+        });
+        fi = fj;
+      } else { fi++; }
+    }
+  }
+  return result;
+}
+
+/* =========================================================================
+   2. APP STATE
+   ========================================================================= */
+var appState = null;
+var charts = {};
+var UI = { activeTab:'overview', presenting:false, caseFilters:{ type:'all', station:'all', month:'all', q:'' } };
+
+function destroyChart(key){ if (charts[key]) { charts[key].destroy(); delete charts[key]; } }
+function mkChart(key, ctx, cfg){ destroyChart(key); charts[key] = new Chart(ctx, cfg); return charts[key]; }
+
+/* ---- 鑽取輔助：依月份/依廠所統計出「來源」明細，供圖表 tooltip 與點擊使用 ---- */
+function breakdownByStation(cases){
+  var map = {};
+  cases.forEach(function(c){
+    var st = c.station || '未標示廠所';
+    map[st] = (map[st]||0) + 1;
+  });
+  return map;
+}
+function breakdownByMonthAndStation(cases){
+  var map = {}; // { '3月': { '新山廠':2, '瑞芳所':1 } }
+  cases.forEach(function(c){
+    var mo = c.month || '未標示月份';
+    var st = c.station || '未標示廠所';
+    if (!map[mo]) map[mo] = {};
+    map[mo][st] = (map[mo][st]||0) + 1;
+  });
+  return map;
+}
+function sortedBreakdownLines(map, prefix){
+  if (!map) return [];
+  var keys = Object.keys(map).sort(function(a,b){ return map[b]-map[a]; });
+  return keys.map(function(k){ return (prefix||'　└ ') + k + '　' + map[k] + ' 件'; });
+}
+/* 跳轉到「缺失案件明細」頁籤，並套用篩選條件 */
+function goToCaseExplorer(filters){
+  document.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.remove('active'); });
+  document.querySelectorAll('.tab-panel').forEach(function(p){ p.classList.remove('active'); });
+  var btn = document.querySelector('.tab-btn[data-tab="cases"]');
+  if (btn) btn.classList.add('active');
+  var panel = document.getElementById('panel-cases');
+  if (panel) panel.classList.add('active');
+  UI.activeTab = 'cases';
+  UI.caseFilters = Object.assign({ type:'all', station:'all', month:'all', q:'' }, filters||{});
+  renderCases();
+  var fType = document.getElementById('fType'), fStation = document.getElementById('fStation'), fMonth = document.getElementById('fMonth');
+  if (fType) fType.value = UI.caseFilters.type;
+  if (fStation) fStation.value = UI.caseFilters.station;
+  if (fMonth) fMonth.value = UI.caseFilters.month;
+  drawCaseList();
+  window.scrollTo(0,0);
+}
+
+var PALETTE = {
+  teal:'#0E7C8A', tealDeep:'#0A5F6B', tealTint:'#BFE1E4',
+  amber:'#E8A317', coral:'#BD463C', navy:'#0A2A3A', gray:'#9FB0B3', grayLight:'#D9E2E3'
+};
+
+/* =========================================================================
+   3. FILE HANDLING
+   ========================================================================= */
+var pendingFiles = { perf:null, rank:null };
+
+function readFileAsWorkbook(file){
+  return new Promise(function(resolve, reject){
+    var reader = new FileReader();
+    reader.onload = function(e){
+      try {
+        var data = new Uint8Array(e.target.result);
+        var wb = XLSX.read(data, {type:'array', cellDates:false});
+        resolve(wb);
+      } catch(err){ reject(err); }
+    };
+    reader.onerror = function(){ reject(new Error('檔案讀取失敗')); };
+    reader.readAsArrayBuffer(file);
+  });
+}
+
+function setupDropzone(dzId, inputId, nameId, key){
+  var dz = document.getElementById(dzId);
+  var input = document.getElementById(inputId);
+  var nameEl = document.getElementById(nameId);
+  input.addEventListener('change', function(){
+    if (input.files && input.files[0]) handleFile(input.files[0], key, dz, nameEl);
+  });
+  dz.addEventListener('dragover', function(e){ e.preventDefault(); dz.classList.add('drag'); });
+  dz.addEventListener('dragleave', function(){ dz.classList.remove('drag'); });
+  dz.addEventListener('drop', function(e){
+    e.preventDefault(); dz.classList.remove('drag');
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      input.files = e.dataTransfer.files;
+      handleFile(e.dataTransfer.files[0], key, dz, nameEl);
+    }
+  });
+}
+function handleFile(file, key, dz, nameEl){
+  pendingFiles[key] = file;
+  dz.classList.add('filled');
+  nameEl.textContent = '已選擇：' + file.name;
+  document.getElementById('btnGenerate').disabled = !(pendingFiles.perf && pendingFiles.rank);
+}
+
+function showUploadError(msg){
+  var el = document.getElementById('uploadError');
+  el.style.display = 'block';
+  el.textContent = msg;
+}
+function clearUploadError(){ document.getElementById('uploadError').style.display = 'none'; }
+
+document.getElementById('btnGenerate').addEventListener('click', function(){
+  clearUploadError();
+  var btn = this; btn.disabled = true; btn.textContent = '解析中…';
+  Promise.all([readFileAsWorkbook(pendingFiles.perf), readFileAsWorkbook(pendingFiles.rank)]).then(function(res){
+    var perf = parsePerfWorkbook(res[0]);
+    var rank = parseRankWorkbook(res[1]);
+    if (!perf.sourceSheet && !perf.totals) {
+      throw new Error('無法在「客戶服務業務績效」檔案中找到當月統計頁簽（應為 5 碼數字，如 11507），請確認檔案格式與頁簽名稱是否正確。');
+    }
+    if (!rank.trial.months.length && !rank.satisfaction.length) {
+      throw new Error('無法在「排名試算表」中找到「排名試算」或「顧客滿意度」頁簽，請確認檔案格式是否正確。');
+    }
+    appState = { perf: perf, rank: rank, generatedAt: new Date().toISOString() };
+    btn.textContent = '產生互動報告';
+    btn.disabled = false;
+    launchDashboard();
+  }).catch(function(err){
+    console.error(err);
+    showUploadError('匯入失敗：' + err.message);
+    btn.disabled = false; btn.textContent = '產生互動報告';
+  });
+});
+
+document.getElementById('btnReupload').addEventListener('click', function(){
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('topActions').style.display = 'none';
+  document.getElementById('uploadScreen').style.display = 'block';
+  document.getElementById('monthLabelText').innerHTML = '尚未匯入資料';
+});
+
+setupDropzone('dz1','file1','dz1name','perf');
+setupDropzone('dz2','file2','dz2name','rank');
+
+/* =========================================================================
+   4. LAUNCH / RENDER ROOT
+   ========================================================================= */
+function launchDashboard(){
+  document.getElementById('uploadScreen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  document.getElementById('topActions').style.display = 'flex';
+  var monthLabel = (appState.perf.monthLabel) ? appState.perf.monthLabel : '本期';
+  document.getElementById('monthLabelText').innerHTML = monthLabel + ' 一區客服業務績效稽核簡報';
+  var updated = new Date(appState.generatedAt);
+  document.getElementById('updatedChip').textContent = '報告產出：' + updated.getFullYear()+'/'+pad2(updated.getMonth()+1)+'/'+pad2(updated.getDate())+' '+pad2(updated.getHours())+':'+pad2(updated.getMinutes());
+  renderOverview();
+  renderRanking();
+  renderCases();
+  window.scrollTo(0,0);
+}
+
+document.querySelectorAll('.tab-btn').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    document.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.remove('active'); });
+    document.querySelectorAll('.tab-panel').forEach(function(p){ p.classList.remove('active'); });
+    btn.classList.add('active');
+    document.getElementById('panel-'+btn.dataset.tab).classList.add('active');
+    UI.activeTab = btn.dataset.tab;
+  });
+});
+
+document.getElementById('btnPresent').addEventListener('click', function(){
+  UI.presenting = !UI.presenting;
+  document.body.classList.toggle('presenting', UI.presenting);
+  this.textContent = UI.presenting ? '結束簡報模式' : '簡報模式';
+});
+
+/* =========================================================================
+   5. TAB 1 — OVERVIEW (一區扣分總覽與分析)
+   ========================================================================= */
+function renderOverview(){
+  var perf = appState.perf;
+  var totals = perf.totals || {};
+  var dsCount = perf.dissatisfied.hasCases ? perf.dissatisfied.rows.length : 0;
+  var deductTotal = num(totals.overdueCum)+num(totals.dupCum)+num(totals.phoneCum)+num(totals.attitudeCum)+dsCount;
+
+  var html = '';
+  html += '<div class="section-head"><h2>一區扣分總覽與分析</h2><span class="section-sub">' + esc(perf.monthLabel||'') + '　累計數據（自年初迄本期）</span></div>';
+
+  html += '<div class="block kpi-grid">';
+  html += kpiCard('後送總案件數', fmtInt(totals.backTotal), '件（累計）', 'navy');
+  html += kpiCard('逾期案件', fmtInt(totals.overdueCum), '件（累計）', 'coral');
+  html += kpiCard('重複案件', fmtInt(totals.dupCum), '件（累計）', 'amber');
+  html += kpiCard('不滿意案件', fmtInt(dsCount), '件（累計）', 'amber');
+  html += kpiCard('扣分總計（推算）', fmtInt(deductTotal), '件', 'coral');
+  html += kpiCard('扣分案件佔比', fmtPct(totals.deductRatio), '佔後送總案件', 'teal');
+  html += '</div>';
+
+  html += '<div class="block grid-2">';
+  html += '<div class="card"><div class="card-title">月份趨勢與扣分成分</div><div class="card-sub">各月「逾期／重複／不滿意」案件件數（依可用月份自動延伸）</div><div class="chart-box tall"><canvas id="chartMonthlyTrend"></canvas></div></div>';
+  html += '<div class="card"><div class="card-title">扣分成分佔比</div><div class="card-sub">本期累計扣分件數組成</div><div class="chart-box tall"><canvas id="chartDeductPie"></canvas></div></div>';
+  html += '</div>';
+
+  html += '<div class="block">';
+  html += '<div class="card"><div class="card-title">轄下廠所／單位扣分排行</div><div class="card-sub">依累計扣分件數（逾期＋重複＋停水公告＋服務態度）排序，找出責任單位</div>';
+  html += '<div class="chart-box tall"><canvas id="chartStationRank"></canvas></div></div>';
+  html += '</div>';
+
+  html += '<div class="block"><div class="section-head"><h2 style="font-size:16.5px;">廠所／單位明細表</h2></div>' + buildStationTable(perf) + '</div>';
+
+  document.getElementById('panel-overview').innerHTML = html;
+
+  renderMonthlyTrendChart();
+  renderDeductPieChart(totals, dsCount);
+  renderStationRankChart(perf);
+}
+
+function kpiCard(label, value, foot, tone){
+  return '<div class="kpi-card tone-'+tone+'"><div class="kpi-bar"></div>' +
+    '<div class="kpi-label">'+esc(label)+'</div>' +
+    '<div class="kpi-value">'+value+'</div>' +
+    '<div class="kpi-foot">'+esc(foot)+'</div></div>';
+}
+
+function buildStationTable(perf){
+  var rows = perf.stations.slice().sort(function(a,b){ return b.computedDeduct - a.computedDeduct; });
+  var out = '<div class="table-wrap"><table><thead><tr>' +
+    '<th>單位／廠所</th><th class="num">後送總案件數</th><th class="num">不滿意/服務態度(累計/當月)</th><th class="num">逾期(累計/當月)</th><th class="num">重複(累計/當月)</th>' +
+    '<th class="num">電話/停水公告(累計/當月)</th><th class="num">扣分推算(累計)</th><th>查覆說明</th></tr></thead><tbody>';
+  if (perf.division) {
+    out += stationRowHtml(perf.division, true);
+  }
+  rows.forEach(function(s){ out += stationRowHtml(s, false); });
+  if (perf.totals) {
+    var t = perf.totals;
+    out += '<tr class="row-total"><td>總計</td><td class="num">'+fmtInt(t.backTotal)+'</td>' +
+      '<td class="num">'+fmtInt(t.attitudeCum)+' / '+monthFigure(t.attitudeMonth)+'</td>' +
+      '<td class="num">'+fmtInt(t.overdueCum)+' / '+monthFigure(t.overdueMonth)+'</td>' +
+      '<td class="num">'+fmtInt(t.dupCum)+' / '+monthFigure(t.dupMonth)+'</td>' +
+      '<td class="num">'+fmtInt(t.phoneCum)+' / '+monthFigure(t.phoneMonth)+'</td>' +
+      '<td class="num">'+fmtInt(t.computedDeduct)+'</td><td>—</td></tr>';
+  }
+  out += '</tbody></table></div>';
+  return out;
+}
+function monthFigure(v){ return '<b class="month-figure">'+fmtInt(v)+'</b>'; }
+function stationRowHtml(s, isHQ){
+  return '<tr'+(isHQ?' class="row-hq"':'')+'>' +
+    '<td>'+esc(s.name)+(isHQ?'　<span class="badge badge-amber">業務課／區處</span>':'')+'</td>' +
+    '<td class="num">'+fmtInt(s.backTotal)+'</td>' +
+    '<td class="num">'+fmtInt(s.attitudeCum)+' / '+monthFigure(s.attitudeMonth)+'</td>' +
+    '<td class="num">'+fmtInt(s.overdueCum)+' / '+monthFigure(s.overdueMonth)+'</td>' +
+    '<td class="num">'+fmtInt(s.dupCum)+' / '+monthFigure(s.dupMonth)+'</td>' +
+    '<td class="num">'+fmtInt(s.phoneCum)+' / '+monthFigure(s.phoneMonth)+'</td>' +
+    '<td class="num">'+fmtInt(s.computedDeduct)+'</td>' +
+    '<td>'+esc(s.note||'—')+'</td></tr>';
+}
+
+function renderMonthlyTrendChart(){
+  var perf = appState.perf;
+  var def = appState.rank.deficiency;
+  var months = def.overdue.months.length ? def.overdue.months : (def.duplicate.months.length ? def.duplicate.months : def.dissatisfied.months);
+  if (!months || !months.length) months = [];
+  var overdue = (def.overdue.byRegion[OUR_REGION_IDX]||{}).monthly || months.map(function(){return 0;});
+  var dup = (def.duplicate.byRegion[OUR_REGION_IDX]||{}).monthly || months.map(function(){return 0;});
+  var dis = (def.dissatisfied.byRegion[OUR_REGION_IDX]||{}).monthly || months.map(function(){return 0;});
+  var ctx = document.getElementById('chartMonthlyTrend');
+  if (!ctx) return;
+
+  // 依「月份＋案件類型」統計出來源廠所，供 tooltip 顯示與點擊鑽取
+  var byMonthStation = {
+    overdue: breakdownByMonthAndStation(perf.overdueCases),
+    duplicate: breakdownByMonthAndStation(perf.duplicateCases),
+    dissatisfied: breakdownByMonthAndStation(perf.dissatisfied.hasCases ? perf.dissatisfied.rows : [])
+  };
+  var typeKeys = ['overdue','duplicate','dissatisfied'];
+
+  mkChart('monthlyTrend', ctx, {
+    type:'bar',
+    data:{ labels: months, datasets:[
+      { label:'逾期案件', data:overdue, backgroundColor: PALETTE.amber, stack:'s' },
+      { label:'重複案件', data:dup, backgroundColor: PALETTE.coral, stack:'s' },
+      { label:'不滿意案件', data:dis, backgroundColor: PALETTE.teal, stack:'s' }
+    ]},
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      onClick: function(evt, elements){
+        if (!elements || !elements.length) return;
+          var el = elements[0];
+          var typeKey = typeKeys[el.datasetIndex];
+          var month = months[el.index];
+          if (!month) return;
+          goToCaseExplorer({ type: typeKey, station:'all', month: month, q:'' });
+      },
+      onHover: function(evt, elements){ evt.native.target.style.cursor = elements.length ? 'pointer' : 'default'; },
+      scales:{ x:{ stacked:true, grid:{display:false} }, y:{ stacked:true, beginAtZero:true, ticks:{precision:0}, grid:{color:'#EAF0F0'} } },
+      plugins:{
+        legend:{ position:'bottom', labels:{ boxWidth:11, boxHeight:11, font:{size:12} } },
+        tooltip:{
+          callbacks:{
+            label: function(ctx2){
+              return ctx2.dataset.label + '：' + ctx2.parsed.y + ' 件';
+            },
+            afterLabel: function(ctx2){
+              var typeKey = typeKeys[ctx2.datasetIndex];
+              var month = months[ctx2.dataIndex];
+              var stMap = byMonthStation[typeKey] && byMonthStation[typeKey][month];
+              if (!stMap) return '';
+              return sortedBreakdownLines(stMap);
+            },
+            footer: function(){ return '點一下可直接跳轉查看案件明細'; }
+          }
+        }
+      }
+    }
+  });
+}
+
+function renderDeductPieChart(totals, dsCount){
+  var perf = appState.perf;
+  var ctx = document.getElementById('chartDeductPie');
+  if (!ctx) return;
+
+  function stationCumMap(field){
+    var map = {};
+    perf.stations.forEach(function(s){ var v = num(s[field]); if (v>0) map[s.name] = v; });
+    return map;
+  }
+
+  var data = [num(totals.overdueCum), num(totals.dupCum), num(totals.phoneCum), num(totals.attitudeCum), dsCount];
+  var labels = ['逾期案件','重複案件','停水公告/1910電話','現場服務態度','不滿意案件'];
+  var typeKeys = ['overdue','duplicate','phone','attitude','dissatisfied'];
+  var colors = [PALETTE.amber, PALETTE.coral, PALETTE.navy, PALETTE.tealDeep, PALETTE.gray];
+  // 每一類扣分「來自哪個廠所」的統計；逾期/重複/不滿意用案件明細，電話/態度用彙總表
+  var breakdownMaps = {
+    overdue: breakdownByStation(perf.overdueCases),
+    duplicate: breakdownByStation(perf.duplicateCases),
+    phone: stationCumMap('phoneCum'),
+    attitude: stationCumMap('attitudeCum'),
+    dissatisfied: breakdownByStation(perf.dissatisfied.hasCases ? perf.dissatisfied.rows : [])
+  };
+  var caseListTypes = { overdue:1, duplicate:1, dissatisfied:1 }; // 這幾類在「缺失案件明細」頁籤有明細可點入查看
+
+  var filtLabels=[], filtData=[], filtColors=[], filtTypeKeys=[];
+  data.forEach(function(v,i){ if (v>0){ filtLabels.push(labels[i]); filtData.push(v); filtColors.push(colors[i]); filtTypeKeys.push(typeKeys[i]); } });
+  if (!filtData.length){ filtLabels=['本期無扣分紀錄']; filtData=[1]; filtColors=[PALETTE.grayLight]; filtTypeKeys=[null]; }
+
+  mkChart('deductPie', ctx, {
+    type:'doughnut',
+    data:{ labels: filtLabels, datasets:[{ data: filtData, backgroundColor: filtColors, borderColor:'#fff', borderWidth:2 }] },
+    options:{
+      responsive:true, maintainAspectRatio:false, cutout:'62%',
+      onClick: function(evt, elements){
+        if (!elements || !elements.length) return;
+        var typeKey = filtTypeKeys[elements[0].index];
+        if (!caseListTypes[typeKey]) return; // 電話/態度扣分目前沒有逐筆案件明細可跳轉
+        goToCaseExplorer({ type: typeKey, station:'all', month:'all', q:'' });
+      },
+      onHover: function(evt, elements){
+        var typeKey = elements.length ? filtTypeKeys[elements[0].index] : null;
+        evt.native.target.style.cursor = (typeKey && caseListTypes[typeKey]) ? 'pointer' : 'default';
+      },
+      plugins:{
+        legend:{ position:'bottom', labels:{ boxWidth:11, boxHeight:11, font:{size:12} } },
+        tooltip:{
+          callbacks:{
+            label: function(ctx2){ return ctx2.label + '：' + ctx2.parsed + ' 件'; },
+            afterLabel: function(ctx2){
+              var typeKey = filtTypeKeys[ctx2.dataIndex];
+              var map = breakdownMaps[typeKey];
+              return sortedBreakdownLines(map);
+            },
+            footer: function(ctx2){
+              var typeKey = filtTypeKeys[ctx2[0].dataIndex];
+              return caseListTypes[typeKey] ? '點一下可直接跳轉查看案件明細' : '';
+            }
+          }
+        }
+      }
+    }
+  });
+}
+
+function renderStationRankChart(perf){
+  var ctx = document.getElementById('chartStationRank');
+  if (!ctx) return;
+  var rows = perf.stations.slice();
+  if (perf.division) rows = rows.concat([perf.division]);
+  rows.sort(function(a,b){ return a.computedDeduct - b.computedDeduct; });
+  var labels = rows.map(function(s){ return s.name; });
+
+  var segTypeKeys = ['overdue','duplicate','phone','attitude'];
+  var segLabels   = ['逾期','重複','電話/停水公告','服務態度'];
+  var segFields   = ['overdueCum','dupCum','phoneCum','attitudeCum'];
+  var segColors   = [PALETTE.amber, PALETTE.coral, PALETTE.navy, PALETTE.tealDeep];
+  var caseListTypes = { overdue:1, duplicate:1 }; // 這兩類在「缺失案件明細」有逐筆資料可跳轉
+
+  var datasets = segTypeKeys.map(function(key, i){
+    return {
+      label: segLabels[i],
+      data: rows.map(function(s){ return num(s[segFields[i]]); }),
+      backgroundColor: segColors[i],
+      stack: 's',
+      maxBarThickness: 26
+    };
+  });
+
+  mkChart('stationRank', ctx, {
+    type:'bar',
+    data:{ labels: labels, datasets: datasets },
+    options:{
+      indexAxis:'y', responsive:true, maintainAspectRatio:false,
+      onClick: function(evt, elements){
+        if (!elements || !elements.length) return;
+        var el = elements[0];
+        var station = labels[el.index];
+        var typeKey = segTypeKeys[el.datasetIndex];
+        if (caseListTypes[typeKey]) {
+          goToCaseExplorer({ type: typeKey, station: station, month:'all', q:'' });
+        } else {
+          goToCaseExplorer({ type:'all', station: station, month:'all', q:'' });
+        }
+      },
+      onHover: function(evt, elements){ evt.native.target.style.cursor = elements.length ? 'pointer' : 'default'; },
+      scales:{
+        x:{ stacked:true, beginAtZero:true, ticks:{precision:0}, grid:{color:'#EAF0F0'} },
+        y:{ stacked:true, grid:{display:false} }
+      },
+      plugins:{
+        legend:{ position:'bottom', labels:{ boxWidth:11, boxHeight:11, font:{size:12} } },
+        tooltip:{
+          callbacks:{
+            label: function(ctx2){ return ctx2.dataset.label + '：' + ctx2.parsed.x + ' 件'; },
+            footer: function(items){
+              var idx = items[0].dataIndex;
+              var s = rows[idx];
+              return '合計扣分推算：' + num(s.computedDeduct) + ' 件';
+            }
+          }
+        }
+      }
+    }
+  });
+}
+
+/* =========================================================================
+   6. TAB 2 — RANKING (成績與總排名)
+   ========================================================================= */
+function renderRanking(){
+  var rank = appState.rank;
+  var trial = rank.trial;
+  var regionEntries = Object.keys(trial.byRegion).map(function(k){ return trial.byRegion[k]; })
+    .map(function(v,i){ return v; });
+  // build array indexed 1..13 with idx
+  var list = [];
+  for (var idx=1; idx<=13; idx++){
+    if (trial.byRegion[idx]) list.push(Object.assign({regionIdx:idx}, trial.byRegion[idx]));
+  }
+  list.sort(function(a,b){ return (a.rank||99) - (b.rank||99); });
+  var ourEntry = trial.byRegion[OUR_REGION_IDX];
+
+  var html = '';
+  html += '<div class="section-head"><h2>成績與總排名</h2><span class="section-sub">「三、客服服務」類別　累計加總後排名（' + esc(trial.months[0]||'') + '～' + esc(trial.months[trial.months.length-1]||'') + '）</span></div>';
+
+  if (ourEntry) {
+    html += '<div class="block kpi-grid">';
+    html += kpiCard('一區累計總分', (ourEntry.total!=null? Number(ourEntry.total).toFixed(2):'—'), '客服服務類別・全期加總', 'teal');
+    html += kpiCard('一區總排名', '第 '+(ourEntry.rank!=null?ourEntry.rank:'—')+' 名', '全公司共 '+list.length+' 個區處', ourEntry.rank<=3?'amber':'navy');
+    var best = list[0], worst = list[list.length-1];
+    html += kpiCard('目前第一名', (best?best.region+'　'+Number(best.total).toFixed(2):'—'), '標竿對象', 'teal');
+    var gapToTop = (ourEntry.total!=null && best) ? (Number(ourEntry.total) - Number(best.total)).toFixed(2) : '—';
+    html += kpiCard('與第一名差距', gapToTop, '分（累計）', 'coral');
+    html += '</div>';
+  }
+
+  html += '<div class="block">';
+  html += '<div class="card"><div class="card-title">全區處累計總分排行榜</div><div class="card-sub">依「三、客服服務」累計加總分數排序，一區以深色標示</div>';
+  html += '<div class="chart-box tall"><canvas id="chartRegionRankBar"></canvas></div></div>';
+  html += '</div>';
+
+  html += '<div class="block table-wrap">' + buildRegionRankTable(list) + '</div>';
+
+  html += '<div class="block" style="margin-top:26px;">';
+  html += '<div class="card"><div class="card-title">各月得分與排名</div><div class="card-sub">各區逐月「加總得分」與「排名」，一區整列標色</div><div class="table-wrap" id="scoreRankTableWrap"></div></div>';
+  html += '</div>';
+  html += '<div class="block" style="margin-top:16px;">';
+  html += '<div class="card"><div class="card-title">一區　各月排名趨勢</div><div class="card-sub">數值越低代表名次越前面</div><div class="chart-box tall"><canvas id="chartRankTrend"></canvas></div></div>';
+  html += '</div>';
+
+  document.getElementById('panel-ranking').innerHTML = html;
+
+  renderRegionRankBar(list);
+  renderScoreRankTable();
+  renderRankTrendChart();
+}
+
+function buildRegionRankTable(list){
+  var out = '<table><thead><tr><th style="width:70px;">排名</th><th>區處</th><th class="num">累計總分</th><th class="num">與第一名差距</th></tr></thead><tbody>';
+  var top = list.length ? Number(list[0].total) : 0;
+  list.forEach(function(item){
+    var isSelf = item.regionIdx === OUR_REGION_IDX;
+    var pillClass = isSelf ? 'self' : (item.rank===1?'gold':'');
+    out += '<tr'+(isSelf?' class="own-row"':'')+'>' +
+      '<td><span class="rank-pill '+pillClass+'">'+ (item.rank!=null?item.rank:'—') +'</span></td>' +
+      '<td>'+esc(item.region)+(isSelf?'　<span class="badge badge-teal">一區（本區）</span>':'')+'</td>' +
+      '<td class="num">'+(item.total!=null?Number(item.total).toFixed(2):'—')+'</td>' +
+      '<td class="num">'+(item.total!=null?(Number(item.total)-top).toFixed(2):'—')+'</td></tr>';
+  });
+  out += '</tbody></table>';
+  return out;
+}
+
+function renderRegionRankBar(list){
+  var ctx = document.getElementById('chartRegionRankBar');
+  if (!ctx) return;
+  var sorted = list.slice().sort(function(a,b){ return b.total - a.total; });
+  var labels = sorted.map(function(x){ return x.region; });
+  var data = sorted.map(function(x){ return x.total; });
+  var colors = sorted.map(function(x){ return x.regionIdx===OUR_REGION_IDX ? PALETTE.navy : PALETTE.tealTint; });
+  mkChart('regionRankBar', ctx, {
+    type:'bar',
+    data:{ labels: labels, datasets:[{ label:'累計總分', data:data, backgroundColor: colors, borderRadius:4, maxBarThickness:34 }] },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      scales:{ y:{ beginAtZero:false, grid:{color:'#EAF0F0'} }, x:{ grid:{display:false} } },
+      plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label:function(c){ return '累計總分：'+Number(c.raw).toFixed(2); } } } }
+    }
+  });
+}
+
+function renderScoreRankTable(){
+  var wrap = document.getElementById('scoreRankTableWrap');
+  if (!wrap) return;
+  var trial = appState.rank.trial;
+  var months = trial.months;
+  var regionIdxs = [];
+  for (var idx=1; idx<=13; idx++){ if (trial.byRegion[idx]) regionIdxs.push(idx); }
+
+  // 逐月計算「當月分數排名」，分數越高排名越前面（與加總排名邏輯一致）
+  var monthlyRanks = months.map(function(_, mi){
+    var scored = regionIdxs.map(function(idx){
+      return { idx:idx, score: Number(trial.byRegion[idx].scores[mi]) };
+    }).filter(function(x){ return !isNaN(x.score); });
+    scored.sort(function(a,b){ return b.score - a.score; });
+    var rankMap = {};
+    scored.forEach(function(s, i){ rankMap[s.idx] = i+1; });
+    return rankMap;
+  });
+
+  var html = '<table class="score-rank-table"><thead><tr><th class="rowlabel">區處</th>';
+  months.forEach(function(m){ html += '<th colspan="2">'+esc(m)+'</th>'; });
+  html += '</tr><tr><th class="rowlabel"></th>';
+  months.forEach(function(){ html += '<th class="sub">分數</th><th class="sub">排名</th>'; });
+  html += '</tr></thead><tbody>';
+
+  regionIdxs.forEach(function(idx){
+    var entry = trial.byRegion[idx];
+    var isSelf = idx === OUR_REGION_IDX;
+    html += '<tr'+(isSelf?' class="own-row"':'')+'><td class="rowlabel">'+esc(entry.region)+(isSelf?'　<span class="badge badge-teal">本區</span>':'')+'</td>';
+    months.forEach(function(m, mi){
+      var score = entry.scores[mi];
+      var rank = monthlyRanks[mi][idx];
+      var rankCls = rank<=3 ? 'rank-good' : (rank>=regionIdxs.length-2 ? 'rank-bad' : '');
+      html += '<td class="num">'+(score!=null && score!==''? Number(score).toFixed(2) : '—')+'</td>' +
+              '<td class="num '+rankCls+'">'+(rank!=null?rank:'—')+'</td>';
+    });
+    html += '</tr>';
+  });
+  html += '</tbody></table>';
+  wrap.innerHTML = html;
+}
+
+function renderRankTrendChart(){
+  var ctx = document.getElementById('chartRankTrend');
+  if (!ctx) return;
+  var cmp = appState.rank.compare;
+  var months = cmp.months;
+  var entry = cmp.byRegion[OUR_REGION_IDX];
+  var datasets = [{
+    label: entry ? entry.region : '一區', data: entry ? entry.ranks : [],
+    borderColor: PALETTE.coral, backgroundColor: PALETTE.coral,
+    borderWidth: 3.5, pointRadius: 3.5, pointBackgroundColor: PALETTE.coral,
+    tension:0.28
+  }];
+  mkChart('rankTrend', ctx, {
+    type:'line',
+    data:{ labels: months, datasets: datasets },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      scales:{ y:{ reverse:true, min:1, ticks:{ stepSize:1, precision:0 }, grid:{color:'#EAF0F0'} }, x:{ grid:{display:false} } },
+      plugins:{ legend:{ display:false }, tooltip:{ callbacks:{ label:function(c){ return '一區　第 '+c.raw+' 名'; } } } }
+    }
+  });
+}
+
+/* =========================================================================
+   7. TAB 3 — CASE EXPLORER (缺失案件明細)
+   ========================================================================= */
+/* 廠所識別色：依廠所名稱字母序固定配色，同一份資料每次重繪顏色都一致 */
+var STATION_COLORS = [
+  {bg:'#E3EEFB', fg:'#1B5FA8'}, // 藍
+  {bg:'#E6F3E9', fg:'#2C7A4B'}, // 綠
+  {bg:'#FBEFE0', fg:'#9A6420'}, // 橙棕
+  {bg:'#F2E7FA', fg:'#7A44A6'}, // 紫
+  {bg:'#FCE8EF', fg:'#A83368'}, // 玫紅
+  {bg:'#E1F3F1', fg:'#0E7C6B'}, // 青綠
+  {bg:'#EFF0DC', fg:'#7A7A22'}, // 橄欖
+  {bg:'#E8E9FB', fg:'#4A4FA8'}, // 靛藍
+  {bg:'#FBEAE4', fg:'#A8492F'}  // 磚紅
+];
+var stationColorMap = {};
+function buildStationColorMap(stations){
+  stationColorMap = {};
+  stations.forEach(function(s, i){ stationColorMap[s] = STATION_COLORS[i % STATION_COLORS.length]; });
+}
+function stationBadgeStyle(station){
+  var c = stationColorMap[station];
+  if (!c) return '';
+  return 'background:'+c.bg+';color:'+c.fg+';';
+}
+
+function allCases(){
+  var perf = appState.perf;
+  var list = [].concat(perf.duplicateCases, perf.overdueCases, perf.dissatisfied.rows);
+  return list;
+}
+function caseLabel(c){
+  return c.type==='duplicate' ? '重複案件' : (c.type==='overdue' ? '逾期案件' : '不滿意案件');
+}
+function caseTypeClass(c){
+  return c.type==='duplicate' ? 'type-duplicate' : (c.type==='overdue' ? 'type-overdue' : 'type-dissatisfied');
+}
+function caseBadgeClass(c){
+  return c.type==='duplicate' ? 'badge-coral' : (c.type==='overdue' ? 'badge-amber' : 'badge-teal');
+}
+
+function renderCases(){
+  var perf = appState.perf;
+  var cases = allCases();
+  var stations = Array.from(new Set(cases.map(function(c){ return c.station; }).filter(Boolean))).sort();
+  var months = Array.from(new Set(cases.map(function(c){ return c.month; }).filter(Boolean)))
+    .sort(function(a,b){ return parseInt(a) - parseInt(b); });
+  buildStationColorMap(stations);
+
+  var html = '';
+  html += '<div class="section-head"><h2>缺失案件明細</h2><span class="section-sub">共 '+cases.length+' 筆　（重複案件 '+perf.duplicateCases.length+'・逾期案件 '+perf.overdueCases.length+'・不滿意案件 '+(perf.dissatisfied.hasCases?perf.dissatisfied.rows.length:0)+'）</span></div>';
+
+  if (!perf.dissatisfied.hasCases) {
+    html += '<div class="note-banner"><svg viewBox="0 0 24 24" fill="none"><path d="M12 8v5M12 16h.01M12 3l9 16H3L12 3Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg><div>'+esc(perf.dissatisfied.note||'本期累計暫無不滿意案件。')+'</div></div>';
+  }
+
+  html += '<div class="filters">' +
+    '<select id="fType"><option value="all">全部類別</option><option value="duplicate">重複案件</option><option value="overdue">逾期案件</option>'+(perf.dissatisfied.hasCases?'<option value="dissatisfied">不滿意案件</option>':'')+'</select>' +
+    '<select id="fStation"><option value="all">全部廠所</option>'+stations.map(function(s){ return '<option value="'+esc(s)+'">'+esc(s)+'</option>'; }).join('')+'</select>' +
+    '<select id="fMonth"><option value="all">全部月份</option>'+months.map(function(m){ return '<option value="'+esc(m)+'">'+esc(m)+'</option>'; }).join('')+'</select>' +
+    '<input type="text" id="fQuery" placeholder="搜尋案件編號／地址／內容關鍵字…">' +
+    '<button type="button" class="btn btn-ghost btn-sm" id="btnClearFilters">清除篩選</button>' +
+    '<span class="filter-count" id="fCount"></span>' +
+  '</div>';
+
+  html += '<div class="case-list" id="caseList"></div>';
+
+  document.getElementById('panel-cases').innerHTML = html;
+
+  document.getElementById('fType').addEventListener('change', function(){ UI.caseFilters.type=this.value; drawCaseList(); });
+  document.getElementById('fStation').addEventListener('change', function(){ UI.caseFilters.station=this.value; drawCaseList(); });
+  document.getElementById('fMonth').addEventListener('change', function(){ UI.caseFilters.month=this.value; drawCaseList(); });
+  document.getElementById('fQuery').addEventListener('input', function(){ UI.caseFilters.q=this.value.trim(); drawCaseList(); });
+  document.getElementById('btnClearFilters').addEventListener('click', function(){
+    UI.caseFilters = { type:'all', station:'all', month:'all', q:'' };
+    document.getElementById('fType').value = 'all';
+    document.getElementById('fStation').value = 'all';
+    document.getElementById('fMonth').value = 'all';
+    document.getElementById('fQuery').value = '';
+    drawCaseList();
+  });
+
+  drawCaseList();
+}
+
+function drawCaseList(){
+  var cases = allCases();
+  var f = UI.caseFilters;
+  var q = (f.q||'').toLowerCase();
+  var filtered = cases.filter(function(c){
+    if (f.type!=='all' && c.type!==f.type) return false;
+    if (f.station!=='all' && c.station!==f.station) return false;
+    if (f.month!=='all' && c.month!==f.month) return false;
+    if (q) {
+      var hay = [c.caseId, c.address, c.description, c.serviceCategory, c.category, c.station].join(' ').toLowerCase();
+      if (hay.indexOf(q) === -1) return false;
+    }
+    return true;
+  });
+  document.getElementById('fCount').textContent = '顯示 '+filtered.length+' / '+cases.length+' 筆';
+  var listEl = document.getElementById('caseList');
+  if (!filtered.length) {
+    listEl.innerHTML = '<div class="empty-note">找不到符合條件的案件，請調整篩選條件。</div>';
+    return;
+  }
+  listEl.innerHTML = filtered.map(function(c, i){
+    // 使用者最常需要看的欄位：地址／案別／「前案」結案內容／申覆結果、未通過原因 → 不用點開就直接顯示
+    var alwaysInfo = [];
+    if (c.address) alwaysInfo.push(['地址', c.address, false]);
+    var cat = c.serviceCategory || c.category;
+    if (cat) alwaysInfo.push(['案別', cat, true]);
+    if (c.type === 'duplicate') {
+      if (c.prevResult) alwaysInfo.push(['「前案」結案內容', c.prevResult, false]);
+      if (c.appealResult) alwaysInfo.push(['申覆結果、未通過原因', c.appealResult, true]);
+    } else if (c.type === 'overdue') {
+      if (c.appealResult) alwaysInfo.push(['申覆結果、未通過原因', c.appealResult, true]);
+    }
+    var alwaysHtml = alwaysInfo.length ? '<div class="case-info">' + alwaysInfo.map(function(kv){
+      var highlight = kv[2] ? ' case-info-value-flag' : '';
+      return '<div class="case-info-row"><span class="case-info-label">'+esc(kv[0])+'</span><span class="case-info-value'+highlight+'">'+esc(kv[1])+'</span></div>';
+    }).join('') + '</div>' : '';
+
+    // 其餘次要欄位維持點一下展開
+    var extra = '';
+    if (c.type==='duplicate') {
+      extra = '<div><b>前案號：</b>'+esc(c.prevCase||'—')+'</div>' +
+        '<div><b>是否扣分：</b>'+(c.deducted?'<span class="badge badge-coral">扣分</span>':'<span class="badge badge-gray">未扣分</span>')+'</div>';
+    } else if (c.type==='overdue') {
+      extra = '<div><b>處理時效：</b>'+(c.processHours!=null?Number(c.processHours).toFixed(1)+' 小時':'—')+'</div>' +
+        '<div><b>修漏案號：</b>'+esc(c.repairCaseId||'—')+'</div>' +
+        '<div><b>逾期情形／說明：</b>'+esc(c.overdueNote||c.completionOverdue||'—')+'</div>';
+    }
+    return '<div class="case-item '+caseTypeClass(c)+'" data-idx="'+i+'">' +
+      '<div class="case-top">' +
+        '<div><span class="badge '+caseBadgeClass(c)+'">'+caseLabel(c)+'</span>　<span class="case-id">'+esc(c.caseId||'')+'</span></div>' +
+        '<div class="case-meta"><span class="station-badge" style="'+stationBadgeStyle(c.station)+'">'+esc(c.station||'未標示')+'</span>'+(c.month?'<span>・'+esc(c.month)+'</span>':'')+(c.reportTime?'<span>・'+esc(c.reportTime)+'</span>':'')+'</div>' +
+      '</div>' +
+      '<div class="case-desc clamp2">'+esc(c.description||c.address||'')+'</div>' +
+      alwaysHtml +
+      (extra ? '<div class="case-detail">' + extra + '</div>' : '') +
+    '</div>';
+  }).join('');
+  Array.prototype.forEach.call(listEl.querySelectorAll('.case-item'), function(el){
+    el.addEventListener('click', function(){ el.classList.toggle('open'); });
+  });
+}
+
+/* =========================================================================
+   8. SNAPSHOT EXPORT (standalone HTML for archiving/sharing)
+   ========================================================================= */
+document.getElementById('btnExport').addEventListener('click', function(){
+  if (!appState) return;
+  var doc = document.documentElement.cloneNode(true);
+  var snapEl = doc.querySelector('#snapshot-data');
+  if (snapEl) snapEl.textContent = JSON.stringify(appState);
+  var title = doc.querySelector('title');
+  var monthLabel = appState.perf.monthLabel || '';
+  if (title) title.textContent = (monthLabel?monthLabel+' ':'') + '一區客服業務績效簡報';
+  var html = '<!DOCTYPE html>\n' + doc.outerHTML;
+  var blob = new Blob([html], {type:'text/html;charset=utf-8'});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  var fname = (monthLabel ? monthLabel.replace(/[年月]/g,'') : 'report') + '_一區客服績效簡報.html';
+  a.href = url; a.download = fname;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 4000);
+});
+
+/* =========================================================================
+   9. BOOTSTRAP — load embedded snapshot if present, else show upload screen
+   ========================================================================= */
+(function bootstrap(){
+  var snapEl = document.getElementById('snapshot-data');
+  var raw = snapEl ? snapEl.textContent.trim() : '';
+  if (raw) {
+    try {
+      appState = JSON.parse(raw);
+      launchDashboard();
+      return;
+    } catch(e){ console.error('快照資料解析失敗，改為顯示上傳畫面', e); }
+  }
+})();
+
+})();
+</script>
+
+</body>
+</html>
