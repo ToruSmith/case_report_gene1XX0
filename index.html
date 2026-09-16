@@ -226,6 +226,31 @@ a{color:var(--teal-deep);}
 
 /* Station table */
 .table-wrap{ overflow-x:auto; border:1px solid var(--line); border-radius:var(--radius); background:var(--card); }
+
+/* 廠所／單位明細表：電腦顯示完整表格，手機切換成精簡可展開表格 */
+.station-table-mobile{ display:none; }
+@media (max-width:640px){
+  .station-table-desktop{ display:none; }
+  .station-table-mobile{ display:block; }
+}
+.station-table-sm{ width:100%; border-collapse:collapse; font-size:13px; table-layout:fixed; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); overflow:hidden; }
+.station-table-sm thead th{ text-align:center; font-size:11.5px; color:var(--ink-soft); font-weight:600; padding:8px 4px; border-bottom:1.5px solid var(--line); background:var(--paper); }
+.station-table-sm thead th.rowlabel{ text-align:left; width:30%; }
+.station-table-sm thead th.chev{ width:24px; }
+.station-table-sm td{ padding:9px 4px; border-bottom:1px solid var(--line); }
+.station-table-sm td.rowlabel{ text-align:left; font-weight:600; }
+.station-table-sm td.num{ text-align:center; font-variant-numeric:tabular-nums; }
+.station-table-sm td.chev{ text-align:right; padding-right:8px; }
+.station-table-sm tr.row-hq td{ background:var(--paper); }
+.station-table-sm tr.row-total td{ background:var(--navy); color:#fff; font-weight:700; border-bottom:none; }
+.station-table-sm tr.station-row-toggle{ cursor:pointer; }
+.station-table-sm tr.station-row-toggle:active{ background:var(--paper); }
+.station-chev{ font-size:16px; color:var(--ink-soft); display:inline-block; transition:transform .15s ease; }
+.station-row-detail td{ background:var(--paper); padding:10px 12px; }
+.station-detail-stats{ display:flex; gap:14px; font-size:12px; color:var(--ink-soft); flex-wrap:wrap; margin-bottom:8px; }
+.station-detail-stats b{ color:var(--ink); }
+.station-detail-note{ font-size:12px; color:var(--ink-soft); line-height:1.6; margin:0; padding-top:8px; border-top:1px solid var(--line); white-space:normal; }
+.station-hint{ font-size:11px; color:var(--ink-soft); text-align:center; margin-top:8px; }
 table{ width:100%; border-collapse:collapse; font-size:13.5px; min-width:640px; }
 thead th{
   text-align:left; background:var(--teal-tint); color:var(--teal-deep); font-weight:700;
@@ -940,36 +965,96 @@ function kpiCard(label, value, foot, tone){
 
 function buildStationTable(perf){
   var rows = perf.stations.slice().sort(function(a,b){ return b.computedDeduct - a.computedDeduct; });
+  var allRows = [];
+  if (perf.division) allRows.push({ s: perf.division, isHQ:true });
+  rows.forEach(function(s){ allRows.push({ s:s, isHQ:false }); });
+
+  return '<div class="station-table-desktop">' + buildStationTableDesktop(perf, allRows) + '</div>' +
+         '<div class="station-table-mobile">' + buildStationTableMobile(perf, allRows) + '</div>';
+}
+
+function buildStationTableDesktop(perf, allRows){
   var out = '<div class="table-wrap"><table><thead><tr>' +
-    '<th>單位／廠所</th><th class="num">後送總案件數</th><th class="num">不滿意/服務態度(累計/當月)</th><th class="num">逾期(累計/當月)</th><th class="num">重複(累計/當月)</th>' +
-    '<th class="num">電話/停水公告(累計/當月)</th><th class="num">扣分推算(累計)</th><th>查覆說明</th></tr></thead><tbody>';
-  if (perf.division) {
-    out += stationRowHtml(perf.division, true);
-  }
-  rows.forEach(function(s){ out += stationRowHtml(s, false); });
+    '<th>單位／廠所</th><th class="num">重複(累計/當月)</th><th class="num">逾期(累計/當月)</th><th class="num">不滿意/服務態度(累計/當月)</th>' +
+    '<th class="num">電話/停水公告(累計/當月)</th><th>查覆說明</th><th class="num">後送總案件數</th><th class="num">扣分推算(累計)</th></tr></thead><tbody>';
+  allRows.forEach(function(r){ out += stationRowHtml(r.s, r.isHQ); });
   if (perf.totals) {
     var t = perf.totals;
-    out += '<tr class="row-total"><td>總計</td><td class="num">'+fmtInt(t.backTotal)+'</td>' +
-      '<td class="num">'+fmtInt(t.attitudeCum)+' / '+monthFigure(t.attitudeMonth)+'</td>' +
-      '<td class="num">'+fmtInt(t.overdueCum)+' / '+monthFigure(t.overdueMonth)+'</td>' +
+    out += '<tr class="row-total"><td>總計</td>' +
       '<td class="num">'+fmtInt(t.dupCum)+' / '+monthFigure(t.dupMonth)+'</td>' +
+      '<td class="num">'+fmtInt(t.overdueCum)+' / '+monthFigure(t.overdueMonth)+'</td>' +
+      '<td class="num">'+fmtInt(t.attitudeCum)+' / '+monthFigure(t.attitudeMonth)+'</td>' +
       '<td class="num">'+fmtInt(t.phoneCum)+' / '+monthFigure(t.phoneMonth)+'</td>' +
-      '<td class="num">'+fmtInt(t.computedDeduct)+'</td><td>—</td></tr>';
+      '<td>—</td>' +
+      '<td class="num">'+fmtInt(t.backTotal)+'</td>' +
+      '<td class="num">'+fmtInt(t.computedDeduct)+'</td></tr>';
   }
   out += '</tbody></table></div>';
   return out;
 }
+
 function monthFigure(v){ return '<b class="month-figure">'+fmtInt(v)+'</b>'; }
 function stationRowHtml(s, isHQ){
   return '<tr'+(isHQ?' class="row-hq"':'')+'>' +
     '<td>'+esc(s.name)+(isHQ?'　<span class="badge badge-amber">業務課／區處</span>':'')+'</td>' +
-    '<td class="num">'+fmtInt(s.backTotal)+'</td>' +
-    '<td class="num">'+fmtInt(s.attitudeCum)+' / '+monthFigure(s.attitudeMonth)+'</td>' +
-    '<td class="num">'+fmtInt(s.overdueCum)+' / '+monthFigure(s.overdueMonth)+'</td>' +
     '<td class="num">'+fmtInt(s.dupCum)+' / '+monthFigure(s.dupMonth)+'</td>' +
+    '<td class="num">'+fmtInt(s.overdueCum)+' / '+monthFigure(s.overdueMonth)+'</td>' +
+    '<td class="num">'+fmtInt(s.attitudeCum)+' / '+monthFigure(s.attitudeMonth)+'</td>' +
     '<td class="num">'+fmtInt(s.phoneCum)+' / '+monthFigure(s.phoneMonth)+'</td>' +
+    '<td>'+esc(s.note||'—')+'</td>' +
+    '<td class="num">'+fmtInt(s.backTotal)+'</td>' +
+    '<td class="num">'+fmtInt(s.computedDeduct)+'</td></tr>';
+}
+
+/* 手機版：精簡表格＋列展開，避免橫向擠壓 */
+function buildStationTableMobile(perf, allRows){
+  var out = '<table class="station-table-sm"><thead><tr>' +
+    '<th class="rowlabel">廠所</th><th class="num">重複</th><th class="num">逾期</th><th class="num">扣分</th><th class="chev"></th>' +
+    '</tr></thead><tbody>';
+  allRows.forEach(function(r, i){
+    out += stationRowHtmlMobile(r.s, r.isHQ, i);
+  });
+  if (perf.totals) {
+    var t = perf.totals;
+    out += '<tr class="row-total"><td class="rowlabel">總計</td>' +
+      '<td class="num">'+fmtInt(t.dupCum)+'</td>' +
+      '<td class="num">'+fmtInt(t.overdueCum)+'</td>' +
+      '<td class="num">'+fmtInt(t.computedDeduct)+'</td><td></td></tr>';
+  }
+  out += '</tbody></table>';
+  out += '<p class="station-hint">點列可展開不滿意／電話公告／查覆說明</p>';
+  return out;
+}
+function stationRowHtmlMobile(s, isHQ, idx){
+  var hasDetail = num(s.attitudeCum)>0 || num(s.phoneCum)>0 || (s.note && s.note.trim());
+  var rid = 'stExp'+idx;
+  var chev = hasDetail ? '<i class="ti ti-chevron-right station-chev" id="'+rid+'-chev" aria-hidden="true"></i>' : '';
+  var rowAttrs = hasDetail ? ' class="station-row-toggle'+(isHQ?' row-hq':'')+'" onclick="toggleStationRow(\''+rid+'\')" role="button" tabindex="0"' : (isHQ?' class="row-hq"':'');
+  var html = '<tr'+rowAttrs+'>' +
+    '<td class="rowlabel">'+esc(s.name)+(isHQ?'<br><span class="badge badge-amber" style="font-size:10px;">業務課／區處</span>':'')+'</td>' +
+    '<td class="num">'+fmtInt(s.dupCum)+'</td>' +
+    '<td class="num">'+fmtInt(s.overdueCum)+'</td>' +
     '<td class="num">'+fmtInt(s.computedDeduct)+'</td>' +
-    '<td>'+esc(s.note||'—')+'</td></tr>';
+    '<td class="chev">'+chev+'</td></tr>';
+  if (hasDetail) {
+    html += '<tr class="station-row-detail" id="'+rid+'" style="display:none;"><td colspan="5">' +
+      '<div class="station-detail-stats">' +
+        '<span>不滿意 <b>'+fmtInt(s.attitudeCum)+'</b></span>' +
+        '<span>電話/公告 <b>'+fmtInt(s.phoneCum)+'</b></span>' +
+        '<span>後送總件 <b>'+fmtInt(s.backTotal)+'</b></span>' +
+      '</div>' +
+      (s.note && s.note.trim() ? '<p class="station-detail-note">'+esc(s.note)+'</p>' : '') +
+      '</td></tr>';
+  }
+  return html;
+}
+function toggleStationRow(rid){
+  var row = document.getElementById(rid);
+  var chev = document.getElementById(rid+'-chev');
+  if (!row) return;
+  var showing = row.style.display !== 'none';
+  row.style.display = showing ? 'none' : 'table-row';
+  if (chev) chev.style.transform = showing ? 'rotate(0deg)' : 'rotate(90deg)';
 }
 
 function renderMonthlyTrendChart(){
